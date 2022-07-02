@@ -9,12 +9,12 @@ PATH_TO_SPECIFIC_CONTENT=/PlexMedia/Anime
 # variables
 NVIDIA_AVAILABLE=false
 
-echo "Welcome to automated FFMPEG transcoder!"
+echo "Welcome to automated FFMPEG script!"
 if [[ "$(inxi -G)" == *"NVIDIA"* ]]; then # check if Nvidia GPU is present
     NVIDIA_AVAILABLE=true
     echo "Nvidia GPU available: "
     INXI_INFO_GPU=$(inxi -G)
-    echo "$INXI_INFO_GPU" | awk -F['Device-1''\n'] '{print $1}'
+    echo $INXI_INFO_GPU | grep -o -P '(?<=Device-1:).*(?=Device-2)'
 fi
 
 
