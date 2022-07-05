@@ -16,23 +16,34 @@ DONE_PATH_TO_FOLDER=false
 CUDA_REQUEST=' -hwaccel cuda -hwaccel_output_format cuda ' 
 
 function select_folder {
-    array=(./*)
+    array=(*)
     echo "There are ${#array[@]} folders in the current path";
     select dir in "${array[@]}"; do 
         echo "you selected ${dir}"; 
-        echo "${dir}"
-        cd "${dir}"
+        cd "${dir}" # later must use cd "${PATH_TO_SPECIFIC_CONTENT}"
+        PATH_TO_SPECIFIC_CONTENT=$PATH_TO_SPECIFIC_CONTENT'/'${dir}
         break;
     done
 }
 
-function check_if_extension_exists { args : string file_ext } {
-    myarray=(`find ./ -maxdepth 1 -name "*.${file_ext}"`)
+function check_if_extension_exists {
+    if [ -e '*.$1' ]; then
+        echo true
+    else
+        echo false
+    fi
+}
+
+function list_files_with_extension {
+    myarray=(`find ./ -maxdepth 1 -name "*.$1"`)
+    echo "There are ${#array[@]} media files in the folder";
     if [ ${#myarray[@]} -gt 0 ]; then 
         echo true 
     else 
         echo false
     fi
+
+
 }
 
 echo "Welcome to automated FFMPEG script!"
@@ -46,11 +57,12 @@ fi
 cd $PATH_TO_MEDIA
 for (( ; ; )) {
     # infinite loop
-    if [ check_if_extension_exists 'mkv' ] || [ check_if_extension_exists 'avi' ] || [ check_if_extension_exists 'mp4' ] ; then
+    check_if_extension_exists "mkv"
+    if [ $? ] ; then
         DONE_PATH_TO_FOLDER=true
         break; # quit loop
+    else 
+        select_folder # select folder until  you reach the destination
     fi
-
-    select_folder # select folder until  you reach the destination
 }
 
