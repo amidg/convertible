@@ -26,10 +26,19 @@ function select_folder {
     done
 }
 
+function check_if_extension_exists { args : string file_ext } {
+    myarray=(`find ./ -maxdepth 1 -name "*.${file_ext}"`)
+    if [ ${#myarray[@]} -gt 0 ]; then 
+        echo true 
+    else 
+        echo false
+    fi
+}
+
 echo "Welcome to automated FFMPEG script!"
 if [[ "$(inxi -G)" == *"NVIDIA"* ]]; then # check if Nvidia GPU is present
     NVIDIA_AVAILABLE=true
-    echo "Nvidia GPU available: "
+    echo "Nvidia GPU available (NVENC autoselected): "
     INXI_INFO_GPU=$(inxi -G)
     echo $INXI_INFO_GPU | grep -o -P '(?<=Device-1:).*(?=Device-2)'
 fi
@@ -37,11 +46,11 @@ fi
 cd $PATH_TO_MEDIA
 for (( ; ; )) {
     # infinite loop
-    select_folder # select folder until  you reach the destination
-
-    if [ -f ${file_with_extension}.mkv ] || [ -f ${file_with_extension}.avi ] || [ -f ${file_with_extension}.mp4 ] ; then
+    if [ check_if_extension_exists 'mkv' ] || [ check_if_extension_exists 'avi' ] || [ check_if_extension_exists 'mp4' ] ; then
         DONE_PATH_TO_FOLDER=true
-        break;
+        break; # quit loop
     fi
+
+    select_folder # select folder until  you reach the destination
 }
 
