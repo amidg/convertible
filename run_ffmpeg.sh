@@ -38,9 +38,9 @@ function list_files_with_extension {
     myarray=(`find ./ -maxdepth 1 -name "*.$1"`)
     echo "There are ${#array[@]} media files in the folder";
     if [ ${#myarray[@]} -gt 0 ]; then 
-        echo true 
+        return true 
     else 
-        echo false
+        return false
     fi
 
 
@@ -57,12 +57,12 @@ fi
 cd $PATH_TO_MEDIA
 for (( ; ; )) {
     # infinite loop
-    check_if_extension_exists "mkv"
-    if [ $? ] ; then
+    select_folder # select folder until  you reach the destination
+   
+    if [ $( check_if_extension_exists "mkv" ) = true ] ; then
+        echo "found mkv"
         DONE_PATH_TO_FOLDER=true
         break; # quit loop
-    else 
-        select_folder # select folder until  you reach the destination
     fi
 }
 
