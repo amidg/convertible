@@ -11,41 +11,64 @@ PATH_TO_AUDIO=$PATH_TO_SPECIFIC_CONTENT
 # variables
 NVIDIA_AVAILABLE=false
 DONE_PATH_TO_FOLDER=false
+CHOSEN_MEDIA_FORMAT=''
+ADD_SUBTITLES=''
+ADD_AUDIO_TRACK1=''
+ADD_AUDIO_TRACK2=''
 
 # constants
 CUDA_REQUEST=' -hwaccel cuda -hwaccel_output_format cuda ' 
+MKV_FORMAT='mkv'
+MP4_FORMAT='mp4'
+AVI_FORMAT='avi'
 
+##################### FUNCTIONS ###############################
 function select_folder {
-    array=(*)
-    echo "There are ${#array[@]} folders in the current path";
-    select dir in "${array[@]}"; do 
+    folders=(*)
+    echo "There are ${#folders[@]} folders in the current path";
+    folders+=("go back")
+    select dir in "${folders[@]}"; do 
         echo "you selected ${dir}"; 
-        cd "${dir}" # later must use cd "${PATH_TO_SPECIFIC_CONTENT}"
-        PATH_TO_SPECIFIC_CONTENT=$PATH_TO_SPECIFIC_CONTENT'/'${dir}
-        break;
+        if [ "$dir" = "go back" ]; then
+            if [ "$(pwd)" != "$PATH_TO_MEDIA" ]; then
+                cd ..
+            fi
+            break;
+        else
+            cd "${dir}" # later must use cd "${PATH_TO_SPECIFIC_CONTENT}"
+            PATH_TO_SPECIFIC_CONTENT=$PATH_TO_SPECIFIC_CONTENT'/'${dir}
+            break;
+        fi
     done
 }
 
 function check_if_extension_exists {
-    if [ -e '*.$1' ]; then
-        echo true
-    else
-        echo false
-    fi
-}
-
-function list_files_with_extension {
-    myarray=(`find ./ -maxdepth 1 -name "*.$1"`)
-    echo "There are ${#array[@]} media files in the folder";
-    if [ ${#myarray[@]} -gt 0 ]; then 
-        return true 
+    filelist=(`find ./ -maxdepth 1 -name "*.$1"`)
+    if [ ${#filelist[@]} -gt 0 ]; then 
+        true 
     else 
-        return false
+        false
     fi
-
-
 }
 
+function select_file_in_folder {
+    shopt -s extglob
+    filelist=( ./*.$1 )
+    echo "There are ${#filelist[@]} media files in the folder";
+    filelist+=("all files")
+    select file in "${filelist[@]}"; do
+        echo "you selected ${file}"
+        break;
+    done
+}
+
+function select_from_two {
+    options=""
+    options+=("$1")
+    options+=()
+}
+
+################### MAIN PROGRAM ##############################
 echo "Welcome to automated FFMPEG script!"
 if [[ "$(inxi -G)" == *"NVIDIA"* ]]; then # check if Nvidia GPU is present
     NVIDIA_AVAILABLE=true
@@ -59,10 +82,18 @@ for (( ; ; )) {
     # infinite loop
     select_folder # select folder until  you reach the destination
    
-    if [ $( check_if_extension_exists "mkv" ) = true ] ; then
-        echo "found mkv"
+    if check_if_extension_exists $MKV_FORMAT; then
         DONE_PATH_TO_FOLDER=true
-        break; # quit loop
+        CHOSEN_MEDIA_FORMAT=$MKV_FORMAT
+        break;
     fi
 }
+
+if $DONE_PATH_TO_FOLDER; then
+    echo "Let's choose $CHOSEN_MEDIA_FORMAT files to convert:"
+    select_file_in_folder $CHOSEN_MEDIA_FORMAT
+
+    read -p "Do you want to add subtitles? [Y/n]: " ADD_SUBTITLES  
+    echo "Let's choose subtitle files to convert:"
+fi
 
