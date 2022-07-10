@@ -74,6 +74,11 @@ function select_from_two {
     return "${option}"
 }
 
+################## BIG FUNCTIONS ##############################
+function add_media_to_video {
+    
+}
+
 ################### MAIN PROGRAM ##############################
 echo "Welcome to automated FFMPEG script!"
 if [[ "$(inxi -G)" == *"NVIDIA"* ]]; then # check if Nvidia GPU is present
@@ -105,6 +110,12 @@ if $DONE_PATH_TO_FOLDER; then
         CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
         echo "$CHOSEN_SUBTITLE_FORMAT"
     fi
-    
+
+    read -p "Do you want to add subtitles? [Y/n]: " ADD_SUBTITLES  
+    if [ "$ADD_SUBTITLES" = "y" ] || [ "$ADD_SUBTITLES" = "Y" ]; then
+        echo "Let's choose subtitle format:"
+        CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
+        echo "$CHOSEN_SUBTITLE_FORMAT"
+    fi
 fi
 
