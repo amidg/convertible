@@ -12,6 +12,8 @@ PATH_TO_AUDIO=$PATH_TO_SPECIFIC_CONTENT
 NVIDIA_AVAILABLE=false
 DONE_PATH_TO_FOLDER=false
 CHOSEN_MEDIA_FORMAT=''
+CHOSEN_SUBTITLE_FORMAT=''
+CHOSEN_AUDIO_FORMAT=''
 ADD_SUBTITLES=''
 ADD_AUDIO_TRACK1=''
 ADD_AUDIO_TRACK2=''
@@ -63,9 +65,13 @@ function select_file_in_folder {
 }
 
 function select_from_two {
-    options=""
-    options+=("$1")
-    options+=()
+    options="$1"
+    options+=("$2")
+    select option in "${options[@]}"; do
+        break;
+    done
+
+    return "${option}"
 }
 
 ################### MAIN PROGRAM ##############################
@@ -94,6 +100,11 @@ if $DONE_PATH_TO_FOLDER; then
     select_file_in_folder $CHOSEN_MEDIA_FORMAT
 
     read -p "Do you want to add subtitles? [Y/n]: " ADD_SUBTITLES  
-    echo "Let's choose subtitle files to convert:"
+    if [ "$ADD_SUBTITLES" = "y" ] || [ "$ADD_SUBTITLES" = "Y" ]; then
+        echo "Let's choose subtitle format:"
+        CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
+        echo "$CHOSEN_SUBTITLE_FORMAT"
+    fi
+    
 fi
 
