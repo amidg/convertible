@@ -14,15 +14,16 @@ DONE_PATH_TO_FOLDER=false
 CHOSEN_MEDIA_FORMAT=''
 CHOSEN_SUBTITLE_FORMAT=''
 CHOSEN_AUDIO_FORMAT=''
-ADD_SUBTITLES=''
-ADD_AUDIO_TRACK1=''
-ADD_AUDIO_TRACK2=''
+SUBTITLE_PATH=''
+AUDIO_TRACK_PATH=''
 
 # constants
 CUDA_REQUEST=' -hwaccel cuda -hwaccel_output_format cuda ' 
 MKV_FORMAT='mkv'
 MP4_FORMAT='mp4'
 AVI_FORMAT='avi'
+SUBTITLE="subtitle"
+AUDIO="audio"
 
 ##################### FUNCTIONS ###############################
 function select_folder {
@@ -75,8 +76,40 @@ function select_from_two {
 }
 
 ################## BIG FUNCTIONS ##############################
-function add_media_to_video {
+function explore_folders_until_you_find {
+    for (( ; ; )) {
+        # infinite loop
+        select_folder # select folder until  you reach the destination
     
+        if check_if_extension_exists $1; then
+            DONE_PATH_TO_FOLDER=true
+            CHOSEN_MEDIA_FORMAT=$1
+            break;
+        fi
+    }
+}
+
+function add_media_to_video {
+    MEDIA_TYPE_TO_ADD="$1"
+    TEMPORARY_PATH=''
+    ADD_NEW_MEDIA=''
+    read -p "Do you want to add $MEDIA_TYPE_TO_ADD? [Y/n]: " ADD_NEW_MEDIA  
+    if [ "$ADD_NEW_MEDIA" = "y" ] || [ "$ADD_NEW_MEDIA" = "Y" ]; then
+        echo "Let's choose subtitle format:"
+        CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
+                
+        read -p "Do you want to add $MEDIA_TYPE_TO_ADD? [Y/n]: " TEMPORARY_PATH 
+        if [ $SUBTITLE_PATH = '' ]; then
+            SUBTITLE_PATH=$TEMPORARY_PATH
+        else
+            SUBTITLE_PATH+="$TEMPORARY_PATH"
+        fi
+                
+        cd "${SUBTITLE_PATH}"
+        if check_if_extension_exists $CHOSEN_SUBTITLE_FORMAT; then
+            break;
+        fi
+    fi
 }
 
 ################### MAIN PROGRAM ##############################
@@ -104,18 +137,6 @@ if $DONE_PATH_TO_FOLDER; then
     echo "Let's choose $CHOSEN_MEDIA_FORMAT files to convert:"
     select_file_in_folder $CHOSEN_MEDIA_FORMAT
 
-    read -p "Do you want to add subtitles? [Y/n]: " ADD_SUBTITLES  
-    if [ "$ADD_SUBTITLES" = "y" ] || [ "$ADD_SUBTITLES" = "Y" ]; then
-        echo "Let's choose subtitle format:"
-        CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
-        echo "$CHOSEN_SUBTITLE_FORMAT"
-    fi
-
-    read -p "Do you want to add subtitles? [Y/n]: " ADD_SUBTITLES  
-    if [ "$ADD_SUBTITLES" = "y" ] || [ "$ADD_SUBTITLES" = "Y" ]; then
-        echo "Let's choose subtitle format:"
-        CHOSEN_SUBTITLE_FORMAT = $(select_from_two 'srt' 'ass')
-        echo "$CHOSEN_SUBTITLE_FORMAT"
-    fi
+    
 fi
 
