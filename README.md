@@ -5,5 +5,5 @@ The most simple FFMPEG GUI designed to simplify video transcoding for normies li
 Designed to work with:
 - CPU
 - NVENC (Nvidia)
-- VAAPI (ADM + Intel)
+- VAAPI (AMD + Intel)
 - AMF (AMD)
