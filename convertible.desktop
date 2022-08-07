@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=convertible
+Icon=/home/dgusev/PROJECTS/CODING/convertible/icon.svg
+StartupNotify=true
+Exec=/home/dgusev/PROJECTS/CODING/convertible/convertible
