@@ -7,7 +7,7 @@
                 "/usr/local/lib/**",
                 "/usr/lib/**",
                 "/usr/include/**",
-                "/usr/inlcude/gtk-4.0"
+                "/usr/inlcude/gtk-4.0/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
